@@ -17,8 +17,13 @@ def get_a_single_user(id: int):
 
 
 def create_a_new_user(user: UserType):
-    new_user = User.create(user)
-    print("USER", user)
+    user_details = User(
+        username=user.username,
+        email=user.email,
+        password=user.password
+    )
+    new_user = User.create(user_details)
+    print("USER", new_user)
     return new_user
 
 
