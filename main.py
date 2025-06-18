@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_cors import CORS
 from db.config import DATABASE_URL
 from db.database import db
 from controllers import users_controller
@@ -8,6 +9,7 @@ import bcrypt
 
 # initialize out application instance
 app = Flask(__name__)
+CORS(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config['SECRET_KEY'] = 'your_strong_secret_key'
@@ -28,6 +30,8 @@ from models.user import User, UserType
 def login():
     login_credentials = request.get_json()
 
+    print("LOGINS", login_credentials)
+
     username = login_credentials['username']
     password = login_credentials['password']
     print('Received data:', username, password)
@@ -40,7 +44,7 @@ def login():
 
     if bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
         access_token = create_access_token(identity=str(user.id))
-        return jsonify({'message': 'Login Success', 'access_token': access_token})
+        return jsonify({'message': 'Login Success', 'access_token': access_token, 'user': jsonify(user)})
     return jsonify({"message": "Username or password is invalid"}), 401
 
 
@@ -50,7 +54,9 @@ def register():
     if request.method == "POST":
         user_details = request.get_json()
 
-        username = user_details['username']
+        print("USER DETAILS", user_details)
+
+        username = user_details['name']
         email = user_details["email"]
         password = user_details['password']
 
